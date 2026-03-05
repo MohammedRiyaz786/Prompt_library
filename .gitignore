@@ -1,0 +1,18 @@
+# Mac files
+.DS_Store
+
+# Zip files
+*.zip
+
+# Env files
+.env
+.env.*
+
+# Temp files
+temp.txt
+
+# Old backups
+*_old
+
+# Logs
+*.log

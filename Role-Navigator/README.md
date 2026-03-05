@@ -218,6 +218,23 @@ npm run db:push     # Push database schema (when using real DB)
 - 🔄 Export/import functionality
 - 🔄 Real database integration
 
+## 🔄 Collaborative Database Sync
+
+To keep prompts in sync between team members (Mac vs. Windows/Docker), use the provided scripts. The `docker/init.sql` file is the source of truth in Git.
+
+### For You (Local Mac User)
+*   **Updating Prompts:** Use `update_prompt.sql` or TablePlus to edit your local DB.
+*   **To Share:** Run `./refresh-docker-db.sh` to update `docker/init.sql`, then commit and push.
+*   **To Get Updates:** After `git pull`, run `./user-load-db.sh` to import teammate changes into your local DB.
+
+### For Teammates (Docker/Windows Users)
+*   **Setup:** Run `docker compose up -d` to start the DB with the latest data.
+*   **Updating Prompts:** Update the DB inside the container (via app UI or SQL).
+*   **To Share:** Run `./teammate-save-db.sh` to update `docker/init.sql` from the container, then commit and push.
+*   **To Get Updates:** Run `docker compose down -v` and `docker compose up -d` to reset the DB with the latest `init.sql` from Git.
+
+---
+
 ## 🛠️ Development Notes
 
 ### Frontend Key Files
