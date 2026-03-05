@@ -1,4 +1,7 @@
 import type { RoleWithUseCases, InsertRole, InsertUseCase } from "@shared/schema";
+import { db } from "./db";
+import { roles, useCases } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   getRolesWithUseCases(): Promise<RoleWithUseCases[]>;
@@ -6,6 +9,29 @@ export interface IStorage {
   createUseCase(useCase: InsertUseCase): Promise<any>;
 }
 
+export class DatabaseStorage implements IStorage {
+  async getRolesWithUseCases(): Promise<RoleWithUseCases[]> {
+    const allRoles = await db.select().from(roles);
+    const allUseCases = await db.select().from(useCases);
+    
+    return allRoles.map(role => ({
+      ...role,
+      useCases: allUseCases.filter(useCase => useCase.roleId === role.id)
+    }));
+  }
+
+  async createRole(role: InsertRole) {
+    const [newRole] = await db.insert(roles).values(role).returning();
+    return { id: newRole.id, category: newRole.category, name: newRole.name };
+  }
+
+  async createUseCase(useCase: InsertUseCase) {
+    const [newUseCase] = await db.insert(useCases).values(useCase).returning();
+    return { id: newUseCase.id, roleId: newUseCase.roleId, title: newUseCase.title, promptTemplate: newUseCase.promptTemplate };
+  }
+}
+
+// Mock data for seeding
 const mockData: RoleWithUseCases[] = [
   // Executive and Leadership Roles
   {
@@ -208,25 +234,17 @@ const mockData: RoleWithUseCases[] = [
 
 export class MockStorage implements IStorage {
   async getRolesWithUseCases(): Promise<RoleWithUseCases[]> {
-    return mockData;
+    // This class is deprecated - use DatabaseStorage instead
+    throw new Error("MockStorage is deprecated. Use DatabaseStorage.");
   }
 
-  async createRole(role: InsertRole) {
-    const newRole = {
-      id: mockData.length + 1,
-      ...role
-    };
-    mockData.push(newRole as any);
-    return { id: newRole.id, category: newRole.category, name: newRole.name };
+  async createRole(role: InsertRole): Promise<{ id: number; category: string; name: string; }> {
+    throw new Error("MockStorage is deprecated. Use DatabaseStorage.");
   }
 
-  async createUseCase(useCase: InsertUseCase) {
-    const newUseCase = {
-      id: mockData.flatMap(r => r.useCases).length + 1,
-      ...useCase
-    };
-    return newUseCase;
+  async createUseCase(useCase: InsertUseCase): Promise<any> {
+    throw new Error("MockStorage is deprecated. Use DatabaseStorage.");
   }
 }
 
-export const storage = new MockStorage();
+export const storage = new DatabaseStorage();
