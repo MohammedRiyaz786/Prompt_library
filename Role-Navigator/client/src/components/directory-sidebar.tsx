@@ -1,0 +1,82 @@
+import { useMemo } from "react";
+import { Layers, Briefcase, ChevronRight } from "lucide-react";
+import { type RoleWithUseCases } from "@shared/schema";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+
+interface DirectorySidebarProps {
+  roles: RoleWithUseCases[];
+  selectedRoleId: number | null;
+  onSelectRole: (id: number) => void;
+}
+
+export function DirectorySidebar({ roles, selectedRoleId, onSelectRole }: DirectorySidebarProps) {
+  // Group roles by category
+  const groupedRoles = useMemo(() => {
+    const groups: Record<string, RoleWithUseCases[]> = {};
+    roles.forEach((role) => {
+      const category = role.category || "Uncategorized";
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(role);
+    });
+    return groups;
+  }, [roles]);
+
+  return (
+    <Sidebar className="border-r border-border/50">
+      <SidebarHeader className="h-14 flex items-center px-4 border-b border-border/50 bg-background/50">
+        <div className="flex items-center gap-2 font-display font-semibold text-foreground">
+          <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center text-primary">
+            <Layers className="w-3.5 h-3.5" />
+          </div>
+          TX Prompt Library
+        </div>
+      </SidebarHeader>
+      
+      <SidebarContent className="custom-scrollbar py-2">
+        {Object.entries(groupedRoles).map(([category, categoryRoles]) => (
+          <SidebarGroup key={category}>
+            <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              {category}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {categoryRoles.map((role) => {
+                  const isActive = role.id === selectedRoleId;
+                  return (
+                    <SidebarMenuItem key={role.id}>
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        onClick={() => onSelectRole(role.id)}
+                        className={`cursor-pointer transition-colors group ${
+                          isActive ? "bg-primary/5 text-primary hover:bg-primary/10" : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Briefcase className={`w-4 h-4 mr-2 ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`} />
+                        <span className="flex-1 truncate">{role.name}</span>
+                        {isActive && (
+                          <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
+    </Sidebar>
+  );
+}

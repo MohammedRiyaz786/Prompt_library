@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Geist', sans-serif;
+    --font-display: 'Outfit', sans-serif;
+    --font-mono: 'Geist Mono', monospace;
+
+    /* Base Colors - Clean, Minimal Light Mode */
+    --background: 0 0% 98%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    
+    /* Primary Accents - Sleek Indigo/Cyan vibe */
+    --primary: 236 86% 65%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders & Inputs */
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 236 86% 65%;
+    
+    /* Sidebar specific */
+    --sidebar: 0 0% 96%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-border: 240 5.9% 90%;
+    --sidebar-accent: 240 4.8% 90.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-primary: 236 86% 65%;
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --radius: 0.75rem;
+
+    /* Elevations */
+    --elevate-1: rgba(0, 0, 0, 0.03);
+    --elevate-2: rgba(0, 0, 0, 0.08);
+  }
+
+  .dark {
+    /* Base Colors - Premium Obsidian Dark */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
+    
+    /* Primary Accents */
+    --primary: 236 86% 70%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders & Inputs */
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 236 86% 70%;
+    
+    /* Sidebar specific */
+    --sidebar: 0 0% 3%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 236 86% 70%;
+    --sidebar-primary-foreground: 0 0% 100%;
+
+    /* Elevations */
+    --elevate-1: rgba(255, 255, 255, 0.04);
+    --elevate-2: rgba(255, 255, 255, 0.09);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply tracking-tight;
+  }
+  code, pre {
+    font-family: var(--font-mono);
+  }
+}
+
+@layer utilities {
+  .hover-elevate {
+    position: relative;
+    z-index: 0;
+  }
+  .hover-elevate::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: 999;
+    transition: background-color 0.2s ease;
+  }
+  .hover-elevate:hover::after {
+    background-color: var(--elevate-1);
+  }
+  .hover-elevate:active::after {
+    background-color: var(--elevate-2);
+  }
+  
+  /* Hide scrollbar for clean look but keep functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Custom styled scrollbar for main areas */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/40;
+  }
+}
