@@ -11,16 +11,16 @@ A comprehensive web application for managing and accessing role-specific AI prom
 - **Routing**: Wouter (lightweight React router)
 - **Theme**: Dark/light theme support with next-themes
 
-### Backend (Express + TypeScript)
-- **Technology Stack**: Express.js, TypeScript, Drizzle ORM
-- **API**: RESTful API with Zod validation
-- **Data Storage**: Currently using mock storage (see Database section below)
+### Backend (FastAPI + Python)
+- **Technology Stack**: Python 3.10+, FastAPI, SQLAlchemy
+- **API**: RESTful API with Pydantic validation
+- **Data Storage**: PostgreSQL (via SQLAlchemy)
 
 ## 🔄 How It Works
 
 ### 1. Data Flow
 ```
-Frontend (React) → API Call → Backend (Express) → Storage → Response → Frontend Display
+Frontend (React) → API Call → Backend (FastAPI) → PostgreSQL → Response → Frontend Display
 ```
 
 ### 2. Frontend Process
@@ -31,9 +31,9 @@ Frontend (React) → API Call → Backend (Express) → Storage → Response →
 5. **Copy Function**: Users can copy prompt templates to clipboard
 
 ### 3. Backend Process
-1. **API Server**: Express server listens on port 5001
+1. **API Server**: FastAPI server listens on port 8000
 2. **Route Handling**: `/api/roles` endpoint returns all roles with use cases
-3. **Data Storage**: Currently uses mock storage with predefined data
+3. **Data Storage**: Connects to PostgreSQL using SQLAlchemy models
 4. **Response**: Returns JSON data with role categories and use cases
 
 ## 🗄️ Database & Storage
@@ -131,12 +131,15 @@ await navigator.clipboard.writeText(activeUseCase?.promptTemplate || "");
 
 ### Prerequisites
 - Node.js 18+ (tested with 18.20.8)
+- Python 3.10+
+- pip (Python package manager)
 - npm or yarn
 
 ### Installation
 ```bash
 cd /Users/mohammedriyaz/Downloads/TX_NEW_PROMPT/Role-Navigator
 npm install
+pip install -r server/requirements.txt
 ```
 
 ### Running the Application
@@ -144,10 +147,10 @@ npm install
 #### Option 1: Development Mode (Recommended)
 Open two terminal windows:
 
-**Terminal 1 - Backend:**
+**Terminal 1 - Backend (Python):**
 ```bash
 cd /Users/mohammedriyaz/Downloads/TX_NEW_PROMPT/Role-Navigator
-PORT=5001 npm run dev
+python -m server.main
 ```
 
 **Terminal 2 - Frontend:**
@@ -177,11 +180,11 @@ Role-Navigator/
 │   │   ├── pages/         # Page components
 │   │   └── lib/          # Utilities
 │   └── index.html        # Entry point
-├── server/               # Express backend
-│   ├── index.ts         # Server entry
-│   ├── routes.ts        # API routes
-│   ├── storage.ts       # Data storage layer
-│   └── db.ts          # Database connection
+├── server/               # Python/FastAPI backend
+│   ├── main.py          # FastAPI app and routes
+│   ├── models.py        # SQLAlchemy models
+│   ├── database.py      # DB connection setup
+│   └── requirements.txt # Python dependencies
 ├── shared/              # Shared types and routes
 │   ├── schema.ts       # Database schemas
 │   └── routes.ts       # API route definitions
@@ -289,8 +292,9 @@ To keep prompts in sync between team members (Mac vs. Windows/Docker), use the p
 
 ### Debug Mode
 - Frontend: Open browser DevTools (F12)
-- Backend: Check terminal for Express logs
-- API: Test with `curl http://localhost:5001/api/roles`
+- Backend: Check terminal for FastAPI/Uvicorn logs
+- API Docs: http://localhost:8000/docs
+- API: Test with `curl http://localhost:8000/api/roles`
 
 ## 📄 License
 
