@@ -28,7 +28,7 @@ class RoleWithUseCasesSchema(BaseModel):
 @app.get("/api/roles", response_model=List[RoleWithUseCasesSchema])
 def get_roles_with_use_cases(db: Session = Depends(get_db)):
     # Query all roles and their associated use cases
-    roles = db.query(Role).all()
+    roles = db.query(Role).order_by(Role.id).all()
     # Map SQLAlchemy objects to include frontend-compatible property names
     for role in roles:
         # Create a list of use case dicts with correct keys

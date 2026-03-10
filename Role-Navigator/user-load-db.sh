@@ -6,17 +6,15 @@
 
 DB_NAME="role_navigator"
 
-echo "⚠️  This will OVERWRITE your local '$DB_NAME' database with the latest from Git."
+echo "⚠️  This will RESET your Docker database '$DB_NAME' with the latest from docker/init.sql."
 read -p "Are you sure? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    echo "📥 Loading latest data into local database..."
-    # Drop and recreate to ensure a clean slate
-    dropdb $DB_NAME 2>/dev/null
-    createdb $DB_NAME
-    psql $DB_NAME < docker/init.sql
-    echo "✅ Success! Your local database is now in sync with the team."
+    echo "📥 Refreshing Docker container with latest data..."
+    docker compose down -v
+    docker compose up -d
+    echo "✅ Success! Your Docker database is now in sync with the team."
 else
     echo "Operation cancelled."
 fi

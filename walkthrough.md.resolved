@@ -1,0 +1,61 @@
+# Walkthrough: Database Migration to Docker
+
+I have successfully migrated your database setup from a local PostgreSQL instance to the Docker-based setup. This ensures that you and your teammates are always in sync and simplifies the collaboration flow.
+
+## Changes Made
+
+### 1. Data Synchronization
+- Initialized `docker/init.sql` with the latest data from your local `role_navigator` database using the [./refresh-docker-db.sh](file:///Users/mohammedriyaz/Downloads/TX_NEW_PROMPT/Role-Navigator/refresh-docker-db.sh) script.
+- Restarted Docker containers with a fresh volume to ensure the database was initialized from the updated `init.sql`.
+
+### 2. Configuration Update
+- Modified [.env](file:///Users/mohammedriyaz/Downloads/TX_NEW_PROMPT/Role-Navigator/.env) to point to the Docker database:
+  ```env
+  DATABASE_URL=postgresql://postgres:postgres@localhost:5435/role_navigator
+  ```
+
+### 3. Cleanup & Automation
+- Verified that the Docker database is running and contains the expected tables (`roles`, `use_cases`).
+
+## Verification Results
+
+### Database Connection
+I verified the connection to the new Docker database using `psql`:
+```bash
+psql postgresql://postgres:postgres@localhost:5435/role_navigator -c "\dt"
+```
+**Result:**
+```text
+           List of relations
+ Schema |   Name    | Type  |  Owner   
+--------+-----------+-------+----------
+ public | roles     | table | postgres
+ public | use_cases | table | postgres
+```
+
+### Application Server
+I attempted to start the server via `npm run dev`. It reported that port `5000` is already in use, which likely means your existing server process is still running. It will now automatically use the new `DATABASE_URL` upon its next restart or if it reloads [.env](file:///Users/mohammedriyaz/Downloads/TX_NEW_PROMPT/Role-Navigator/.env) changes.
+
+## Confirmed Collaboration Workflow
+
+Yes, you are **exactly right**! The workflow is now standardized for both you and your teammate:
+
+1.  **When you make changes to the DB**:
+    - Run [./refresh-docker-db.sh](file:///Users/mohammedriyaz/Downloads/TX_NEW_PROMPT/Role-Navigator/refresh-docker-db.sh).
+    - This will now automatically extract data from your **Docker container** and update `docker/init.sql`.
+    - Commit and push the updated `docker/init.sql`.
+
+2.  **When your teammate makes changes**:
+    - You `git pull` the latest changes.
+    - Run [./user-load-db.sh](file:///Users/mohammedriyaz/Downloads/TX_NEW_PROMPT/Role-Navigator/user-load-db.sh) (or manually run `docker compose down -v && docker compose up -d`).
+    - This will reset your Docker database using the new `docker/init.sql` from Git.
+
+## Updated Helper Scripts
+
+I have updated your scripts to ensure they target the Docker container instead of your local (non-Docker) PostgreSQL:
+
+- **[refresh-docker-db.sh](file:///Users/mohammedriyaz/Downloads/TX_NEW_PROMPT/Role-Navigator/refresh-docker-db.sh)**: Now uses `docker exec` to dump data directly from the container. Both you and your teammate can now use this same script.
+- **[user-load-db.sh](file:///Users/mohammedriyaz/Downloads/TX_NEW_PROMPT/Role-Navigator/user-load-db.sh)**: Now acts as a shortcut for resetting your Docker volume (`docker compose down -v && docker compose up -d`).
+
+> [!TIP]
+> Since you are now using the Docker database on port **5435**, if you use any external tools (like PGAdmin or DBeaver), make sure to update your connection string to use port `5435` and the password `postgres`.

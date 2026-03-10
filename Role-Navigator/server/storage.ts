@@ -11,7 +11,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getRolesWithUseCases(): Promise<RoleWithUseCases[]> {
-    const allRoles = await db.select().from(roles);
+    const allRoles = await db.select().from(roles).orderBy(roles.id);
     const allUseCases = await db.select().from(useCases);
 
     return allRoles.map(role => ({

@@ -20,17 +20,22 @@ interface DirectorySidebarProps {
 }
 
 export function DirectorySidebar({ roles, selectedRoleId, onSelectRole }: DirectorySidebarProps) {
-  // Group roles by category
-  const groupedRoles = useMemo(() => {
-    const groups: Record<string, RoleWithUseCases[]> = {};
+  // Group roles by category and maintain order
+  const categories = useMemo(() => {
+    const groups: Record<string, { roles: RoleWithUseCases[]; minId: number }> = {};
     roles.forEach((role) => {
       const category = role.category || "Uncategorized";
       if (!groups[category]) {
-        groups[category] = [];
+        groups[category] = { roles: [], minId: role.id };
       }
-      groups[category].push(role);
+      groups[category].roles.push(role);
+      groups[category].minId = Math.min(groups[category].minId, role.id);
     });
-    return groups;
+
+    // Return categories sorted by their minimum role ID
+    return Object.entries(groups)
+      .sort(([, a], [, b]) => a.minId - b.minId)
+      .map(([name, data]) => ({ name, roles: data.roles.sort((a, b) => a.id - b.id) }));
   }, [roles]);
 
   return (
@@ -40,28 +45,27 @@ export function DirectorySidebar({ roles, selectedRoleId, onSelectRole }: Direct
           <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center text-primary">
             <Layers className="w-3.5 h-3.5" />
           </div>
-          TX Prompt Library
+          Tx Prompt Library
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent className="custom-scrollbar py-2">
-        {Object.entries(groupedRoles).map(([category, categoryRoles]) => (
+        {categories.map(({ name: category, roles: categoryRoles }) => (
           <SidebarGroup key={category}>
             <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
               {category}
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {categoryRoles.map((role) => {
+                {categoryRoles.map((role: RoleWithUseCases) => {
                   const isActive = role.id === selectedRoleId;
                   return (
                     <SidebarMenuItem key={role.id}>
                       <SidebarMenuButton
                         isActive={isActive}
                         onClick={() => onSelectRole(role.id)}
-                        className={`cursor-pointer transition-colors group ${
-                          isActive ? "bg-primary/5 text-primary hover:bg-primary/10" : "text-muted-foreground hover:text-foreground"
-                        }`}
+                        className={`cursor-pointer transition-colors group ${isActive ? "bg-primary/5 text-primary hover:bg-primary/10" : "text-muted-foreground hover:text-foreground"
+                          }`}
                       >
                         <Briefcase className={`w-4 h-4 mr-2 ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`} />
                         <span className="flex-1 truncate">{role.name}</span>
